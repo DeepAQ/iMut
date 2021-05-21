@@ -1,0 +1,565 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		341D959B2654EF56006133E3 /* ConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 341D959A2654EF56006133E3 /* ConfigManager.swift */; };
+		3468437326556D5E005A8B95 /* ConfigEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3468437226556D5E005A8B95 /* ConfigEditView.swift */; };
+		34A3336E264DF68700DA0D2F /* iMutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A3336D264DF68700DA0D2F /* iMutApp.swift */; };
+		34A33370264DF68700DA0D2F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A3336F264DF68700DA0D2F /* ContentView.swift */; };
+		34A33372264DF68800DA0D2F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 34A33371264DF68800DA0D2F /* Assets.xcassets */; };
+		34A33375264DF68800DA0D2F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 34A33374264DF68800DA0D2F /* Preview Assets.xcassets */; };
+		34A3337D264DF69F00DA0D2F /* TunnelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A3337C264DF69F00DA0D2F /* TunnelManager.swift */; };
+		34A33381264DF73500DA0D2F /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A33380264DF73500DA0D2F /* NetworkExtension.framework */; };
+		34A33387264DF74100DA0D2F /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A33380264DF73500DA0D2F /* NetworkExtension.framework */; };
+		34A3338A264DF74100DA0D2F /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A33389264DF74100DA0D2F /* PacketTunnelProvider.swift */; };
+		34A3338F264DF74100DA0D2F /* PTExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 34A33386264DF74100DA0D2F /* PTExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		34A33395264DF80800DA0D2F /* Core.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A33394264DF80800DA0D2F /* Core.framework */; };
+		34A33398264DFDFC00DA0D2F /* libtun2socks.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A33397264DFDFC00DA0D2F /* libtun2socks.a */; };
+		34B1C5EE2656B4C20007B0DE /* ConfigItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B1C5ED2656B4C20007B0DE /* ConfigItemView.swift */; };
+		34BE538C2651899600CFEFEF /* libtun2socks-simulator.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34BE538B2651899600CFEFEF /* libtun2socks-simulator.a */; };
+		34D1F71E2657B31600FA1E51 /* directip.txt in Resources */ = {isa = PBXBuildFile; fileRef = 34D1F71D2657B31600FA1E51 /* directip.txt */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		34A3338D264DF74100DA0D2F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34A33362264DF68700DA0D2F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 34A33385264DF74100DA0D2F;
+			remoteInfo = PTExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		34A33393264DF74100DA0D2F /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				34A3338F264DF74100DA0D2F /* PTExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		341D959A2654EF56006133E3 /* ConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigManager.swift; sourceTree = "<group>"; };
+		3468437226556D5E005A8B95 /* ConfigEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigEditView.swift; sourceTree = "<group>"; };
+		34A3336A264DF68700DA0D2F /* iMut.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMut.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		34A3336D264DF68700DA0D2F /* iMutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iMutApp.swift; sourceTree = "<group>"; };
+		34A3336F264DF68700DA0D2F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		34A33371264DF68800DA0D2F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		34A33374264DF68800DA0D2F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		34A33376264DF68800DA0D2F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		34A3337C264DF69F00DA0D2F /* TunnelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelManager.swift; sourceTree = "<group>"; };
+		34A3337E264DF73500DA0D2F /* iMut.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iMut.entitlements; sourceTree = "<group>"; };
+		34A33380264DF73500DA0D2F /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
+		34A33386264DF74100DA0D2F /* PTExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PTExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		34A33389264DF74100DA0D2F /* PacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketTunnelProvider.swift; sourceTree = "<group>"; };
+		34A3338B264DF74100DA0D2F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		34A3338C264DF74100DA0D2F /* PTExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PTExtension.entitlements; sourceTree = "<group>"; };
+		34A33394264DF80800DA0D2F /* Core.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Core.framework; sourceTree = "<group>"; };
+		34A33397264DFDFC00DA0D2F /* libtun2socks.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libtun2socks.a; sourceTree = "<group>"; };
+		34A33399264DFE7300DA0D2F /* tun2socks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tun2socks.h; sourceTree = "<group>"; };
+		34A3339A264DFE9000DA0D2F /* PTExtension-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PTExtension-Bridging-Header.h"; sourceTree = "<group>"; };
+		34B1C5ED2656B4C20007B0DE /* ConfigItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigItemView.swift; sourceTree = "<group>"; };
+		34BE538B2651899600CFEFEF /* libtun2socks-simulator.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libtun2socks-simulator.a"; sourceTree = "<group>"; };
+		34D1F71D2657B31600FA1E51 /* directip.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = directip.txt; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		34A33367264DF68700DA0D2F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				34A33381264DF73500DA0D2F /* NetworkExtension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		34A33383264DF74100DA0D2F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				34A33387264DF74100DA0D2F /* NetworkExtension.framework in Frameworks */,
+				34A33398264DFDFC00DA0D2F /* libtun2socks.a in Frameworks */,
+				34A33395264DF80800DA0D2F /* Core.framework in Frameworks */,
+				34BE538C2651899600CFEFEF /* libtun2socks-simulator.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		34A33361264DF68700DA0D2F = {
+			isa = PBXGroup;
+			children = (
+				34A3336C264DF68700DA0D2F /* iMut */,
+				34A33388264DF74100DA0D2F /* PTExtension */,
+				34A3336B264DF68700DA0D2F /* Products */,
+				34A3337F264DF73500DA0D2F /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		34A3336B264DF68700DA0D2F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				34A3336A264DF68700DA0D2F /* iMut.app */,
+				34A33386264DF74100DA0D2F /* PTExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		34A3336C264DF68700DA0D2F /* iMut */ = {
+			isa = PBXGroup;
+			children = (
+				34A3337E264DF73500DA0D2F /* iMut.entitlements */,
+				34A3336D264DF68700DA0D2F /* iMutApp.swift */,
+				34A3336F264DF68700DA0D2F /* ContentView.swift */,
+				34A33371264DF68800DA0D2F /* Assets.xcassets */,
+				34A33376264DF68800DA0D2F /* Info.plist */,
+				34A33373264DF68800DA0D2F /* Preview Content */,
+				34A3337C264DF69F00DA0D2F /* TunnelManager.swift */,
+				341D959A2654EF56006133E3 /* ConfigManager.swift */,
+				3468437226556D5E005A8B95 /* ConfigEditView.swift */,
+				34B1C5ED2656B4C20007B0DE /* ConfigItemView.swift */,
+			);
+			path = iMut;
+			sourceTree = "<group>";
+		};
+		34A33373264DF68800DA0D2F /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				34A33374264DF68800DA0D2F /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		34A3337F264DF73500DA0D2F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				34A33394264DF80800DA0D2F /* Core.framework */,
+				34A33380264DF73500DA0D2F /* NetworkExtension.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		34A33388264DF74100DA0D2F /* PTExtension */ = {
+			isa = PBXGroup;
+			children = (
+				34D1F71D2657B31600FA1E51 /* directip.txt */,
+				34A33396264DFDEB00DA0D2F /* tun2socks */,
+				34A33389264DF74100DA0D2F /* PacketTunnelProvider.swift */,
+				34A3338B264DF74100DA0D2F /* Info.plist */,
+				34A3338C264DF74100DA0D2F /* PTExtension.entitlements */,
+				34A3339A264DFE9000DA0D2F /* PTExtension-Bridging-Header.h */,
+			);
+			path = PTExtension;
+			sourceTree = "<group>";
+		};
+		34A33396264DFDEB00DA0D2F /* tun2socks */ = {
+			isa = PBXGroup;
+			children = (
+				34A33397264DFDFC00DA0D2F /* libtun2socks.a */,
+				34BE538B2651899600CFEFEF /* libtun2socks-simulator.a */,
+				34A33399264DFE7300DA0D2F /* tun2socks.h */,
+			);
+			path = tun2socks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		34A33369264DF68700DA0D2F /* iMut */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 34A33379264DF68800DA0D2F /* Build configuration list for PBXNativeTarget "iMut" */;
+			buildPhases = (
+				34A33366264DF68700DA0D2F /* Sources */,
+				34A33367264DF68700DA0D2F /* Frameworks */,
+				34A33368264DF68700DA0D2F /* Resources */,
+				34A33393264DF74100DA0D2F /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				34A3338E264DF74100DA0D2F /* PBXTargetDependency */,
+			);
+			name = iMut;
+			productName = iMut;
+			productReference = 34A3336A264DF68700DA0D2F /* iMut.app */;
+			productType = "com.apple.product-type.application";
+		};
+		34A33385264DF74100DA0D2F /* PTExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 34A33390264DF74100DA0D2F /* Build configuration list for PBXNativeTarget "PTExtension" */;
+			buildPhases = (
+				34A33382264DF74100DA0D2F /* Sources */,
+				34A33383264DF74100DA0D2F /* Frameworks */,
+				34A33384264DF74100DA0D2F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PTExtension;
+			productName = PTExtension;
+			productReference = 34A33386264DF74100DA0D2F /* PTExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		34A33362264DF68700DA0D2F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1250;
+				LastUpgradeCheck = 1250;
+				TargetAttributes = {
+					34A33369264DF68700DA0D2F = {
+						CreatedOnToolsVersion = 12.5;
+					};
+					34A33385264DF74100DA0D2F = {
+						CreatedOnToolsVersion = 12.5;
+						LastSwiftMigration = 1250;
+					};
+				};
+			};
+			buildConfigurationList = 34A33365264DF68700DA0D2F /* Build configuration list for PBXProject "iMut" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 34A33361264DF68700DA0D2F;
+			productRefGroup = 34A3336B264DF68700DA0D2F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				34A33369264DF68700DA0D2F /* iMut */,
+				34A33385264DF74100DA0D2F /* PTExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		34A33368264DF68700DA0D2F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				34A33375264DF68800DA0D2F /* Preview Assets.xcassets in Resources */,
+				34A33372264DF68800DA0D2F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		34A33384264DF74100DA0D2F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				34D1F71E2657B31600FA1E51 /* directip.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		34A33366264DF68700DA0D2F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				341D959B2654EF56006133E3 /* ConfigManager.swift in Sources */,
+				34B1C5EE2656B4C20007B0DE /* ConfigItemView.swift in Sources */,
+				34A3337D264DF69F00DA0D2F /* TunnelManager.swift in Sources */,
+				34A33370264DF68700DA0D2F /* ContentView.swift in Sources */,
+				3468437326556D5E005A8B95 /* ConfigEditView.swift in Sources */,
+				34A3336E264DF68700DA0D2F /* iMutApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		34A33382264DF74100DA0D2F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				34A3338A264DF74100DA0D2F /* PacketTunnelProvider.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		34A3338E264DF74100DA0D2F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 34A33385264DF74100DA0D2F /* PTExtension */;
+			targetProxy = 34A3338D264DF74100DA0D2F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		34A33377264DF68800DA0D2F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VALIDATE_WORKSPACE = YES;
+			};
+			name = Debug;
+		};
+		34A33378264DF68800DA0D2F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+				VALIDATE_WORKSPACE = YES;
+			};
+			name = Release;
+		};
+		34A3337A264DF68800DA0D2F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iMut/iMut.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"iMut/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iMut/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.mut.iMut;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		34A3337B264DF68800DA0D2F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iMut/iMut.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"iMut/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iMut/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.mut.iMut;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		34A33391264DF74100DA0D2F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = PTExtension/PTExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = PTExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/PTExtension/tun2socks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.mut.iMut.PTExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "PTExtension/PTExtension-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		34A33392264DF74100DA0D2F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = PTExtension/PTExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = PTExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/PTExtension/tun2socks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.mut.iMut.PTExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "PTExtension/PTExtension-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		34A33365264DF68700DA0D2F /* Build configuration list for PBXProject "iMut" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				34A33377264DF68800DA0D2F /* Debug */,
+				34A33378264DF68800DA0D2F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		34A33379264DF68800DA0D2F /* Build configuration list for PBXNativeTarget "iMut" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				34A3337A264DF68800DA0D2F /* Debug */,
+				34A3337B264DF68800DA0D2F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		34A33390264DF74100DA0D2F /* Build configuration list for PBXNativeTarget "PTExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				34A33391264DF74100DA0D2F /* Debug */,
+				34A33392264DF74100DA0D2F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 34A33362264DF68700DA0D2F /* Project object */;
+}

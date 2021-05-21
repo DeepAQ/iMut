@@ -1,0 +1,547 @@
+Index: libtun2socks.xcodeproj/project.pbxproj
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/libtun2socks.xcodeproj/project.pbxproj b/libtun2socks.xcodeproj/project.pbxproj
+--- a/libtun2socks.xcodeproj/project.pbxproj	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
++++ b/libtun2socks.xcodeproj/project.pbxproj	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
+@@ -1290,6 +1290,7 @@
+ 			developmentRegion = English;
+ 			hasScannedForEncodings = 0;
+ 			knownRegions = (
++				English,
+ 				en,
+ 			);
+ 			mainGroup = 4B384DE91B60CA66005922AA;
+@@ -1473,6 +1474,7 @@
+ 					"$(inherited)",
+ 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+ 					"$(SRCROOT)",
++					"$(SRCROOT)/include",
+ 					"$(SRCROOT)/lwip/src/include",
+ 				);
+ 				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+@@ -1526,6 +1528,7 @@
+ 					"$(inherited)",
+ 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+ 					"$(SRCROOT)",
++					"$(SRCROOT)/include",
+ 					"$(SRCROOT)/lwip/src/include",
+ 				);
+ 				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+Index: system/BTime.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/system/BTime.c b/system/BTime.c
+--- a/system/BTime.c	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
++++ b/system/BTime.c	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
+@@ -41,7 +41,7 @@
+ #include <mach/clock.h>
+ #include <mach/mach.h>
+ 
+-int clock_gettime(int clk_id, struct timespec* t)
++int clock_gettime_custom(int clk_id, struct timespec* t)
+ {
+     clock_serv_t cclock;
+     mach_timespec_t mts;
+Index: system/BTime.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/system/BTime.h b/system/BTime.h
+--- a/system/BTime.h	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
++++ b/system/BTime.h	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
+@@ -71,7 +71,7 @@
+ 
+ #ifdef __MACH__
+ #define CLOCK_MONOTONIC 1
+-int clock_gettime(int clk_id, struct timespec* t);
++int clock_gettime_custom(int clk_id, struct timespec* t);
+ #endif
+ 
+ extern struct _BTime_global btime_global;
+@@ -91,7 +91,7 @@
+     #else
+     
+     struct timespec ts;
+-    if (clock_gettime(CLOCK_MONOTONIC, &ts) < 0) {
++    if (clock_gettime_custom(CLOCK_MONOTONIC, &ts) < 0) {
+         BLog(BLOG_WARNING, "CLOCK_MONOTONIC is not available. Timers will be confused by clock changes.");
+         
+         struct timeval tv;
+@@ -135,7 +135,7 @@
+         return ((int64_t)tv.tv_sec * 1000 + (int64_t)tv.tv_usec/1000);
+     } else {
+         struct timespec ts;
+-        ASSERT_FORCE(clock_gettime(CLOCK_MONOTONIC, &ts) == 0)
++        ASSERT_FORCE(clock_gettime_custom(CLOCK_MONOTONIC, &ts) == 0)
+         return (((int64_t)ts.tv_sec * 1000 + (int64_t)ts.tv_nsec/1000000) - btime_global.start_time);
+     }
+     
+Index: tun2socks/SocksUdpGwClient.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/tun2socks/SocksUdpGwClient.c b/tun2socks/SocksUdpGwClient.c
+--- a/tun2socks/SocksUdpGwClient.c	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
++++ b/tun2socks/SocksUdpGwClient.c	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
+@@ -36,7 +36,7 @@
+ #ifdef BADVPN_SOCKS_UDP_RELAY
+ 
+ #include <misc/socks_proto.h>
+-#define CONNECTION_UDP_BUFFER_SIZE 1
++#define CONNECTION_UDP_BUFFER_SIZE 8
+ 
+ #else
+ 
+@@ -81,53 +81,49 @@
+     
+     // accept packet
+     PacketPassInterface_Done(&o->udp_recv_if);
+-    
+-    // check header
+-    if (data_len < sizeof(struct socks_udp_header)) {
+-        BLog(BLOG_ERROR, "missing header");
+-        return;
+-    }
+-    struct socks_udp_header header;
+-    memcpy(&header, data, sizeof(header));
+-    data += sizeof(header);
+-    data_len -= sizeof(header);
+-    uint8_t frag = header.frag;
+-    uint8_t atyp = header.atyp;
+-    
+-    // check fragment
+-    if (frag) {
+-        BLog(BLOG_ERROR, "unexpected frag");
+-        return;
+-    }
+-    
+-    // parse address
+-    BAddr remote_addr;
+-    if (atyp == SOCKS_ATYP_IPV6) {
+-        if (data_len < sizeof(struct udpgw_addr_ipv6)) {
+-            BLog(BLOG_ERROR, "missing ipv6 address");
+-            return;
+-        }
+-        struct udpgw_addr_ipv6 addr_ipv6;
+-        memcpy(&addr_ipv6, data, sizeof(addr_ipv6));
+-        data += sizeof(addr_ipv6);
+-        data_len -= sizeof(addr_ipv6);
+-        BAddr_InitIPv6(&remote_addr, addr_ipv6.addr_ip, addr_ipv6.addr_port);
+-    } else {
+-        if (data_len < sizeof(struct udpgw_addr_ipv4)) {
+-            BLog(BLOG_ERROR, "missing ipv4 address");
+-            return;
+-        }
+-        struct udpgw_addr_ipv4 addr_ipv4;
+-        memcpy(&addr_ipv4, data, sizeof(addr_ipv4));
+-        data += sizeof(addr_ipv4);
+-        data_len -= sizeof(addr_ipv4);
+-        BAddr_InitIPv4(&remote_addr, addr_ipv4.addr_ip, addr_ipv4.addr_port);
+-    }
+-    
+-    // check remote addr
+-    if (!BAddr_Compare(&remote_addr, &o->conaddr.remote_addr)) {
+-        BLog(BLOG_ERROR, "remote addr not match");
+-        return;
++
++    BAddr remote_addr = o->conaddr.remote_addr;
++    if (!o->conaddr.is_dns) {
++        // check header
++        if (data_len < sizeof(struct socks_udp_header)) {
++            BLog(BLOG_ERROR, "missing header");
++            return;
++        }
++        struct socks_udp_header header;
++        memcpy(&header, data, sizeof(header));
++        data += sizeof(header);
++        data_len -= sizeof(header);
++        uint8_t frag = header.frag;
++        uint8_t atyp = header.atyp;
++
++        // check fragment
++        if (frag) {
++            BLog(BLOG_ERROR, "unexpected frag");
++            return;
++        }
++
++        // parse address
++        if (atyp == SOCKS_ATYP_IPV6) {
++            if (data_len < sizeof(struct udpgw_addr_ipv6)) {
++                BLog(BLOG_ERROR, "missing ipv6 address");
++                return;
++            }
++            struct udpgw_addr_ipv6 addr_ipv6;
++            memcpy(&addr_ipv6, data, sizeof(addr_ipv6));
++            data += sizeof(addr_ipv6);
++            data_len -= sizeof(addr_ipv6);
++            BAddr_InitIPv6(&remote_addr, addr_ipv6.addr_ip, addr_ipv6.addr_port);
++        } else {
++            if (data_len < sizeof(struct udpgw_addr_ipv4)) {
++                BLog(BLOG_ERROR, "missing ipv4 address");
++                return;
++            }
++            struct udpgw_addr_ipv4 addr_ipv4;
++            memcpy(&addr_ipv4, data, sizeof(addr_ipv4));
++            data += sizeof(addr_ipv4);
++            data_len -= sizeof(addr_ipv4);
++            BAddr_InitIPv4(&remote_addr, addr_ipv4.addr_ip, addr_ipv4.addr_port);
++        }
+     }
+     
+     // check remaining data
+@@ -142,11 +138,16 @@
+ 
+ static int conaddr_comparator (void *unused, SocksUdpGwClient_conaddr *v1, SocksUdpGwClient_conaddr *v2)
+ {
+-    int r = BAddr_CompareOrder(&v1->remote_addr, &v2->remote_addr);
+-    if (r) {
+-        return r;
++    int cmp = B_COMPARE(v1->is_dns, v2->is_dns);
++    if (cmp) {
++        return cmp;
+     }
+-    return BAddr_CompareOrder(&v1->local_addr, &v2->local_addr);
++
++    cmp = BAddr_CompareOrder(&v1->local_addr, &v2->local_addr);
++    if (cmp || !v1->is_dns) {
++        return cmp;
++    }
++    return BAddr_CompareOrder(&v1->remote_addr, &v2->remote_addr);
+ }
+ 
+ static SocksUdpGwClient_connection * find_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr)
+@@ -188,36 +189,40 @@
+         return;
+     }
+     int out_pos = 0;
+-    
+-    // write header
+-    BAddr remote_addr = o->conaddr.remote_addr;
+-    struct socks_udp_header header;
+-    header.rsv = 0;
+-    header.frag = 0;
+-    if (remote_addr.type == BADDR_TYPE_IPV4) {
+-        header.atyp = SOCKS_ATYP_IPV4;
+-    } else {
+-        header.atyp = SOCKS_ATYP_IPV6;
+-    }
+-    memcpy(out + out_pos, &header, sizeof(header));
+-    out_pos += sizeof(header);
+-    
+-    // write address
+-    switch (remote_addr.type) {
+-        case BADDR_TYPE_IPV4: {
+-            struct udpgw_addr_ipv4 addr_ipv4;
+-            addr_ipv4.addr_ip = remote_addr.ipv4.ip;
+-            addr_ipv4.addr_port = remote_addr.ipv4.port;
+-            memcpy(out + out_pos, &addr_ipv4, sizeof(addr_ipv4));
+-            out_pos += sizeof(addr_ipv4);
+-        } break;
+-        case BADDR_TYPE_IPV6: {
+-            struct udpgw_addr_ipv6 addr_ipv6;
+-            memcpy(addr_ipv6.addr_ip, remote_addr.ipv6.ip, sizeof(addr_ipv6.addr_ip));
+-            addr_ipv6.addr_port = remote_addr.ipv6.port;
+-            memcpy(out + out_pos, &addr_ipv6, sizeof(addr_ipv6));
+-            out_pos += sizeof(addr_ipv6);
+-        } break;
++
++    if (!o->conaddr.is_dns) {
++        // write header
++        BAddr remote_addr = o->conaddr.remote_addr;
++        struct socks_udp_header header;
++        header.rsv = 0;
++        header.frag = 0;
++        if (remote_addr.type == BADDR_TYPE_IPV4) {
++            header.atyp = SOCKS_ATYP_IPV4;
++        } else {
++            header.atyp = SOCKS_ATYP_IPV6;
++        }
++        memcpy(out + out_pos, &header, sizeof(header));
++        out_pos += sizeof(header);
++
++        // write address
++        switch (remote_addr.type) {
++            case BADDR_TYPE_IPV4: {
++                struct udpgw_addr_ipv4 addr_ipv4;
++                addr_ipv4.addr_ip = remote_addr.ipv4.ip;
++                addr_ipv4.addr_port = remote_addr.ipv4.port;
++                memcpy(out + out_pos, &addr_ipv4, sizeof(addr_ipv4));
++                out_pos += sizeof(addr_ipv4);
++            }
++                break;
++            case BADDR_TYPE_IPV6: {
++                struct udpgw_addr_ipv6 addr_ipv6;
++                memcpy(addr_ipv6.addr_ip, remote_addr.ipv6.ip, sizeof(addr_ipv6.addr_ip));
++                addr_ipv6.addr_port = remote_addr.ipv6.port;
++                memcpy(out + out_pos, &addr_ipv6, sizeof(addr_ipv6));
++                out_pos += sizeof(addr_ipv6);
++            }
++                break;
++        }
+     }
+     
+     // write packet to buffer
+@@ -266,8 +271,13 @@
+     // set UDP dgram send address
+     BIPAddr ipaddr;
+     memset(&ipaddr, 0, sizeof(ipaddr));
+-    ipaddr.type = client->socks_server_addr.type;
+-    BDatagram_SetSendAddrs(&o->udp_dgram, client->socks_server_addr, ipaddr);
++    if (o->conaddr.is_dns) {
++        ipaddr.type = client->dnsgw.type;
++        BDatagram_SetSendAddrs(&o->udp_dgram, client->dnsgw, ipaddr);
++    } else {
++        ipaddr.type = client->socks_server_addr.type;
++        BDatagram_SetSendAddrs(&o->udp_dgram, client->socks_server_addr, ipaddr);
++    }
+     
+     // init UDP dgram interfaces
+     BDatagram_SendAsync_Init(&o->udp_dgram, client->udp_mtu);
+@@ -480,7 +490,7 @@
+ 
+ int SocksUdpGwClient_Init (SocksUdpGwClient *o, int udp_mtu, int max_connections, int send_buffer_size, btime_t keepalive_time,
+                            BAddr socks_server_addr, const struct BSocksClient_auth_info *auth_info, size_t num_auth_info,
+-                           BAddr remote_udpgw_addr, btime_t reconnect_time, BReactor *reactor, void *user,
++                           BAddr remote_udpgw_addr, BAddr dnsgw, btime_t reconnect_time, BReactor *reactor, void *user,
+                            SocksUdpGwClient_handler_received handler_received)
+ {
+     // see asserts in UdpGwClient_Init
+@@ -495,6 +505,7 @@
+     o->auth_info = auth_info;
+     o->num_auth_info = num_auth_info;
+     o->remote_udpgw_addr = remote_udpgw_addr;
++    o->dnsgw = dnsgw;
+     o->reactor = reactor;
+     o->user = user;
+     o->handler_received = handler_received;
+@@ -579,6 +590,7 @@
+     SocksUdpGwClient_conaddr conaddr;
+     conaddr.local_addr = local_addr;
+     conaddr.remote_addr = remote_addr;
++    conaddr.is_dns = is_dns;
+     
+     // lookup connection
+     SocksUdpGwClient_connection *con = find_connection(o, conaddr);
+@@ -597,6 +609,7 @@
+         LinkedList1_Append(&o->connections_list, &con->connections_list_node);
+         
+         // send packet to existing connection
++        con->conaddr.remote_addr = remote_addr;
+         connection_send(con, data, data_len);
+     }
+ #else
+Index: tun2socks/SocksUdpGwClient.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/tun2socks/SocksUdpGwClient.h b/tun2socks/SocksUdpGwClient.h
+--- a/tun2socks/SocksUdpGwClient.h	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
++++ b/tun2socks/SocksUdpGwClient.h	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
+@@ -55,6 +55,7 @@
+     const struct BSocksClient_auth_info *auth_info;
+     size_t num_auth_info;
+     BAddr remote_udpgw_addr;
++    BAddr dnsgw;
+     BReactor *reactor;
+     void *user;
+     SocksUdpGwClient_handler_received handler_received;
+@@ -78,6 +79,7 @@
+ typedef struct {
+     BAddr local_addr;
+     BAddr remote_addr;
++    int is_dns;
+ } SocksUdpGwClient_conaddr;
+ 
+ typedef struct {
+@@ -98,7 +100,7 @@
+ 
+ int SocksUdpGwClient_Init (SocksUdpGwClient *o, int udp_mtu, int max_connections, int send_buffer_size, btime_t keepalive_time,
+                            BAddr socks_server_addr, const struct BSocksClient_auth_info *auth_info, size_t num_auth_info,
+-                           BAddr remote_udpgw_addr, btime_t reconnect_time, BReactor *reactor, void *user,
++                           BAddr remote_udpgw_addr, BAddr dnsgw, btime_t reconnect_time, BReactor *reactor, void *user,
+                            SocksUdpGwClient_handler_received handler_received) WARN_UNUSED;
+ void SocksUdpGwClient_Free (SocksUdpGwClient *o);
+ void SocksUdpGwClient_SubmitPacket (SocksUdpGwClient *o, BAddr local_addr, BAddr remote_addr, int is_dns, const uint8_t *data, int data_len);
+Index: tun2socks/tun2socks.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/tun2socks/tun2socks.c b/tun2socks/tun2socks.c
+--- a/tun2socks/tun2socks.c	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
++++ b/tun2socks/tun2socks.c	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
+@@ -98,6 +98,8 @@
+     #endif
+     int loglevel;
+     int loglevels[BLOG_NUM_CHANNELS];
++    int tunfd;
++    int tunmtu;
+     char *tundev;
+     char *netif_ipaddr;
+     char *netif_netmask;
+@@ -109,6 +111,7 @@
+     int append_source_to_username;
+     char *udpgw_remote_server_addr;
+     int udpgw_max_connections;
++    char *dnsgw;
+     int udpgw_connection_buffer_size;
+     int udpgw_transparent_dns;
+ } options;
+@@ -159,6 +162,9 @@
+ // remote udpgw server addr, if provided
+ BAddr udpgw_remote_server_addr;
+ 
++// dnsgw addr, if provided
++BAddr dnsgw;
++
+ // reactor
+ BReactor ss;
+ 
+@@ -332,7 +338,17 @@
+     }
+     
+     // init TUN device
+-    if (!BTap_Init(&device, &ss, options.tundev, device_error_handler, NULL, 1)) {
++    struct BTap_init_data init_data;
++    init_data.dev_type = BTAP_DEV_TUN;
++    if (options.tundev) {
++        init_data.init_type = BTAP_INIT_STRING;
++        init_data.init.string = options.tundev;
++    } else {
++        init_data.init_type = BTAP_INIT_FD;
++        init_data.init.fd.fd = options.tunfd;
++        init_data.init.fd.mtu = options.tunmtu;
++    }
++    if (!BTap_Init2(&device, &ss, init_data, device_error_handler, NULL)) {
+         BLog(BLOG_ERROR, "BTap_Init failed");
+         goto fail3;
+     }
+@@ -372,7 +388,7 @@
+         // init udpgw client
+         if (!SocksUdpGwClient_Init(&udpgw_client, udp_mtu, DEFAULT_UDPGW_MAX_CONNECTIONS, options.udpgw_connection_buffer_size, UDPGW_KEEPALIVE_TIME,
+                                    socks_server_addr, socks_auth_info, socks_num_auth_info,
+-                                   udpgw_remote_server_addr, UDPGW_RECONNECT_TIME, &ss, NULL, udpgw_client_handler_received
++                                   udpgw_remote_server_addr, dnsgw, UDPGW_RECONNECT_TIME, &ss, NULL, udpgw_client_handler_received
+         )) {
+             BLog(BLOG_ERROR, "SocksUdpGwClient_Init failed");
+             goto fail4a;
+@@ -486,6 +502,7 @@
+         #endif
+         "        [--loglevel <0-5/none/error/warning/notice/info/debug>]\n"
+         "        [--channel-loglevel <channel-name> <0-5/none/error/warning/notice/info/debug>] ...\n"
++        "        [--tunfd <fd> --tunmtu <mtu>]\n"
+         "        [--tundev <name>]\n"
+         "        --netif-ipaddr <ipaddr>\n"
+         "        --netif-netmask <ipnetmask>\n"
+@@ -498,6 +515,7 @@
+ #ifdef BADVPN_SOCKS_UDP_RELAY
+         "        [--enable-udprelay]\n"
+         "        [--udprelay-max-connections <number>]\n"
++        "        [--dnsgw <addr>]\n"
+ #else
+         "        [--udpgw-remote-server-addr <addr>]\n"
+         "        [--udpgw-max-connections <number>]\n"
+@@ -531,6 +549,8 @@
+     for (int i = 0; i < BLOG_NUM_CHANNELS; i++) {
+         options.loglevels[i] = -1;
+     }
++    options.tunfd = 0;
++    options.tunmtu = 0;
+     options.tundev = NULL;
+     options.netif_ipaddr = NULL;
+     options.netif_netmask = NULL;
+@@ -542,6 +562,7 @@
+     options.append_source_to_username = 0;
+     options.udpgw_remote_server_addr = NULL;
+     options.udpgw_max_connections = DEFAULT_UDPGW_MAX_CONNECTIONS;
++    options.dnsgw = NULL;
+     options.udpgw_connection_buffer_size = DEFAULT_UDPGW_CONNECTION_BUFFER_SIZE;
+     options.udpgw_transparent_dns = 0;
+     
+@@ -621,6 +642,22 @@
+             options.loglevels[channel] = loglevel;
+             i += 2;
+         }
++        else if (!strcmp(arg, "--tunfd")) {
++            if (1 >= argc - i) {
++                fprintf(stderr, "%s: requires an argument\n", arg);
++                return 0;
++            }
++            options.tunfd = atoi(argv[i + 1]);
++            i++;
++        }
++        else if (!strcmp(arg, "--tunmtu")) {
++            if (1 >= argc - i) {
++                fprintf(stderr, "%s: requires an argument\n", arg);
++                return 0;
++            }
++            options.tunmtu = atoi(argv[i + 1]);
++            i++;
++        }
+         else if (!strcmp(arg, "--tundev")) {
+             if (1 >= argc - i) {
+                 fprintf(stderr, "%s: requires an argument\n", arg);
+@@ -716,7 +753,16 @@
+             }
+             i++;
+         }
+-#ifndef BADVPN_SOCKS_UDP_RELAY
++#ifdef BADVPN_SOCKS_UDP_RELAY
++        else if (!strcmp(arg, "--dnsgw")) {
++            if (1 >= argc - i) {
++                fprintf(stderr, "%s: requires an argument\n", arg);
++                return 0;
++            }
++            options.dnsgw = argv[i + 1];
++            i++;
++        }
++#else
+         else if (!strcmp(arg, "--udpgw-connection-buffer-size")) {
+             if (1 >= argc - i) {
+                 fprintf(stderr, "%s: requires an argument\n", arg);
+@@ -846,6 +892,14 @@
+             return 0;
+         }
+     }
++    
++    // resolve dnsgw address
++    if (options.dnsgw) {
++        if (!BAddr_Parse2(&dnsgw, options.dnsgw, NULL, 0, 0)) {
++            BLog(BLOG_ERROR, "dnsgw addr: BAddr_Parse2 failed");
++            return 0;
++        }
++    }
+     
+     return 1;
+ }
+@@ -1081,12 +1135,16 @@
+             // construct addresses
+             BAddr_InitIPv4(&local_addr, ipv4_header.source_address, udp_header.source_port);
+             BAddr_InitIPv4(&remote_addr, ipv4_header.destination_address, udp_header.dest_port);
+-            
+-            // if transparent DNS is enabled, any packet arriving at out netif
+-            // address to port 53 is considered a DNS packet
+-            is_dns = (options.udpgw_transparent_dns &&
+-                      ipv4_header.destination_address == netif_ipaddr.ipv4 &&
+-                      udp_header.dest_port == hton16(53));
++
++            if (options.dnsgw) {
++                is_dns = udp_header.dest_port == hton16(53);
++            } else {
++                // if transparent DNS is enabled, any packet arriving at out netif
++                // address to port 53 is considered a DNS packet
++                is_dns = (options.udpgw_transparent_dns &&
++                        ipv4_header.destination_address == netif_ipaddr.ipv4 &&
++                        udp_header.dest_port == hton16(53));
++            }
+         } break;
+         
+         case 6: {
