@@ -11,6 +11,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         settings.ipv4Settings = NEIPv4Settings(addresses: ["240.0.0.2"], subnetMasks: ["255.255.255.252"])
         settings.ipv4Settings?.includedRoutes = [NEIPv4Route.default()]
         settings.dnsSettings = NEDNSSettings(servers: ["240.0.0.1"])
+//        let dnsSettings = NEDNSOverHTTPSSettings(servers: ["1.1.1.1"])
+//        dnsSettings.serverURL = URL(string: "https://1.1.1.1/dns-query")
+//        settings.dnsSettings = dnsSettings
         settings.proxySettings = NEProxySettings()
 //        settings.proxySettings?.httpEnabled = true
         settings.proxySettings?.httpsEnabled = true
@@ -62,32 +65,31 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let bypassSpecial = userDefaults?.bool(forKey: "bypassSpecial") ?? false
         let allowDebug = userDefaults?.bool(forKey: "allowDebug") ?? false
 
-        CoreSetGCPercent(1)
-        CoreUseDefaultLogger()
-        ConfigSetFreeMemoryInterval(60)
-        ConfigSetTcpStreamTimeout(60)
-        ConfigSetUdpStreamTimeout(30)
+        GlobalSetGCPercent(1)
+        GlobalUseDefaultLogger()
+        GlobalSetFreeMemoryInterval(60)
+        GlobalSetTcpStreamTimeout(60)
+        GlobalSetUdpStreamTimeout(30)
 
-        let builder = CoreInstanceBuilder()
-        builder.addArg("-in")
-        builder.addArg("mix://localhost:1082/?udp=1")
-        builder.addArg("-out")
-        builder.addArg(outbound)
-        builder.addArg("-dns")
-        builder.addArg(dns)
+        let launcher = CoreLauncher()
+        launcher.addArg("-in")
+        launcher.addArg("mix://localhost:1082/?udp=1")
+        launcher.addArg("-out")
+        launcher.addArg(outbound)
+        launcher.addArg("-dns")
+        launcher.addArg(dns)
         if bypassSpecial {
             if let path = Bundle.main.url(forResource: "directip", withExtension: "txt")?.path {
-                builder.addArg("-rules")
-                builder.addArg("cidr:\(path),direct;final,default")
+                launcher.addArg("-rules")
+                launcher.addArg("cidr:\(path),direct;final,default")
             }
         }
         if allowDebug {
-            builder.addArg("-debug")
-            builder.addArg("6061")
+            launcher.addArg("-debug")
+            launcher.addArg("6061")
         }
 
-        let instance = try builder.create()
-        instance.start()
+        try launcher.runDetached()
         NSLog("Mut instance started")
 
         let memoryPressureSource = DispatchSource.makeMemoryPressureSource(eventMask: .all, queue: DispatchQueue.global(qos: .userInteractive))
@@ -95,7 +97,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             NSLog("Received memory pressure event " + String(memoryPressureSource.data))
             switch memoryPressureSource.data {
             case .warning, .critical:
-                CoreFreeOSMemory()
+                GlobalFreeOSMemory()
             default:
                 break
             }

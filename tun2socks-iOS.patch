@@ -1,35 +1,3 @@
-Index: libtun2socks.xcodeproj/project.pbxproj
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/libtun2socks.xcodeproj/project.pbxproj b/libtun2socks.xcodeproj/project.pbxproj
---- a/libtun2socks.xcodeproj/project.pbxproj	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
-+++ b/libtun2socks.xcodeproj/project.pbxproj	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
-@@ -1290,6 +1290,7 @@
- 			developmentRegion = English;
- 			hasScannedForEncodings = 0;
- 			knownRegions = (
-+				English,
- 				en,
- 			);
- 			mainGroup = 4B384DE91B60CA66005922AA;
-@@ -1473,6 +1474,7 @@
- 					"$(inherited)",
- 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
- 					"$(SRCROOT)",
-+					"$(SRCROOT)/include",
- 					"$(SRCROOT)/lwip/src/include",
- 				);
- 				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
-@@ -1526,6 +1528,7 @@
- 					"$(inherited)",
- 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
- 					"$(SRCROOT)",
-+					"$(SRCROOT)/include",
- 					"$(SRCROOT)/lwip/src/include",
- 				);
- 				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 Index: system/BTime.c
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
@@ -37,7 +5,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/system/BTime.c b/system/BTime.c
 --- a/system/BTime.c	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
-+++ b/system/BTime.c	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
++++ b/system/BTime.c	(revision 7e10414980f3116be7307919bf85ace46ecb6122)
 @@ -41,7 +41,7 @@
  #include <mach/clock.h>
  #include <mach/mach.h>
@@ -47,6 +15,12 @@ diff --git a/system/BTime.c b/system/BTime.c
  {
      clock_serv_t cclock;
      mach_timespec_t mts;
+@@ -52,4 +52,5 @@
+     t->tv_nsec = mts.tv_nsec;
+     return 0;
+ }
++
+ #endif
 Index: system/BTime.h
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
@@ -54,7 +28,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/system/BTime.h b/system/BTime.h
 --- a/system/BTime.h	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
-+++ b/system/BTime.h	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
++++ b/system/BTime.h	(revision 7e10414980f3116be7307919bf85ace46ecb6122)
 @@ -71,7 +71,7 @@
  
  #ifdef __MACH__
@@ -89,17 +63,28 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/tun2socks/SocksUdpGwClient.c b/tun2socks/SocksUdpGwClient.c
 --- a/tun2socks/SocksUdpGwClient.c	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
-+++ b/tun2socks/SocksUdpGwClient.c	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
-@@ -36,7 +36,7 @@
++++ b/tun2socks/SocksUdpGwClient.c	(revision 7e10414980f3116be7307919bf85ace46ecb6122)
+@@ -36,7 +36,8 @@
  #ifdef BADVPN_SOCKS_UDP_RELAY
  
  #include <misc/socks_proto.h>
 -#define CONNECTION_UDP_BUFFER_SIZE 1
-+#define CONNECTION_UDP_BUFFER_SIZE 8
++#define CONNECTION_UDP_BUFFER_SIZE 2
++#define CONNECTION_UDP_TIMEOUT 30
  
  #else
  
-@@ -81,53 +81,49 @@
+@@ -54,7 +55,8 @@
+ static void dgram_handler_received (SocksUdpGwClient_connection *o, uint8_t *data, int data_len);
+ static int conaddr_comparator (void *unused, SocksUdpGwClient_conaddr *v1, SocksUdpGwClient_conaddr *v2);
+ static SocksUdpGwClient_connection * find_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr);
+-static SocksUdpGwClient_connection * reuse_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr);
++static void recycle_connections (SocksUdpGwClient *o);
++static void force_recycle_connection (SocksUdpGwClient *o);
+ static void connection_send (SocksUdpGwClient_connection *o, const uint8_t *data, int data_len);
+ static void connection_first_job_handler (SocksUdpGwClient_connection *con);
+ static SocksUdpGwClient_connection *connection_init (SocksUdpGwClient *client, SocksUdpGwClient_conaddr conaddr, const uint8_t *data, int data_len);
+@@ -81,53 +83,49 @@
      
      // accept packet
      PacketPassInterface_Done(&o->udp_recv_if);
@@ -196,7 +181,19 @@ diff --git a/tun2socks/SocksUdpGwClient.c b/tun2socks/SocksUdpGwClient.c
      }
      
      // check remaining data
-@@ -142,11 +138,16 @@
+@@ -135,6 +133,11 @@
+         BLog(BLOG_ERROR, "too much data");
+         return;
+     }
++
++    // move connection to front of the list
++    time(&o->last_active_time);
++    LinkedList1_Remove(&client->connections_list, &o->connections_list_node);
++    LinkedList1_Append(&client->connections_list, &o->connections_list_node);
+     
+     // submit to user
+     client->handler_received(client->user, o->conaddr.local_addr, remote_addr, data, data_len);
+@@ -142,11 +145,16 @@
  
  static int conaddr_comparator (void *unused, SocksUdpGwClient_conaddr *v1, SocksUdpGwClient_conaddr *v2)
  {
@@ -217,7 +214,53 @@ diff --git a/tun2socks/SocksUdpGwClient.c b/tun2socks/SocksUdpGwClient.c
  }
  
  static SocksUdpGwClient_connection * find_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr)
-@@ -188,36 +189,40 @@
+@@ -159,24 +167,32 @@
+     return UPPER_OBJECT(tree_node, SocksUdpGwClient_connection, connections_tree_node);
+ }
+ 
+-static SocksUdpGwClient_connection * reuse_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr)
++static void recycle_connections (SocksUdpGwClient *o)
+ {
+-    ASSERT(!find_connection(o, conaddr))
++    time_t now = time(NULL);
++    while (1) {
++        LinkedList1Node *node = LinkedList1_GetFirst(&o->connections_list);
++        if (!node) {
++            break;
++        }
++        SocksUdpGwClient_connection *con = UPPER_OBJECT(node, SocksUdpGwClient_connection, connections_list_node);
++        if (!con->last_active_time || now - con->last_active_time <= CONNECTION_UDP_TIMEOUT) {
++            break;
++        }
++        connection_free(con);
++    }
++}
++
++static void force_recycle_connection (SocksUdpGwClient *o)
++{
+     ASSERT(o->num_connections > 0)
+     
+     // get least recently used connection
+     SocksUdpGwClient_connection *con = UPPER_OBJECT(LinkedList1_GetFirst(&o->connections_list), SocksUdpGwClient_connection, connections_list_node);
+-    
+-    // remove from connections tree by conaddr
+-    BAVL_Remove(&o->connections_tree, &con->connections_tree_node);
+-    
+-    // set new conaddr
+-    con->conaddr = conaddr;
+-    
+-    // insert to connections tree by conaddr
+-    ASSERT_EXECUTE(BAVL_Insert(&o->connections_tree, &con->connections_tree_node, NULL))
+-    
+-    return con;
++
++    if (con) {
++        connection_free(con);
++    }
+ }
+ 
+ static void connection_send (SocksUdpGwClient_connection *o, const uint8_t *data, int data_len)
+@@ -188,36 +204,40 @@
          return;
      }
      int out_pos = 0;
@@ -288,7 +331,27 @@ diff --git a/tun2socks/SocksUdpGwClient.c b/tun2socks/SocksUdpGwClient.c
      }
      
      // write packet to buffer
-@@ -266,8 +271,13 @@
+@@ -226,6 +246,11 @@
+     
+     // submit written message
+     BufferWriter_EndPacket(&o->udp_send_writer, out_pos);
++
++    // move connection to front of the list
++    time(&o->last_active_time);
++    LinkedList1_Remove(&o->client->connections_list, &o->connections_list_node);
++    LinkedList1_Append(&o->client->connections_list, &o->connections_list_node);
+ }
+ 
+ static void connection_first_job_handler (SocksUdpGwClient_connection *con)
+@@ -247,6 +272,7 @@
+     o->conaddr = conaddr;
+     o->first_data = data;
+     o->first_data_len = data_len;
++    time(&o->last_active_time);
+     
+     // init first job
+     BPending_Init(&o->first_job, BReactor_PendingGroup(client->reactor), (BPending_handler)connection_first_job_handler, o);
+@@ -266,8 +292,13 @@
      // set UDP dgram send address
      BIPAddr ipaddr;
      memset(&ipaddr, 0, sizeof(ipaddr));
@@ -304,7 +367,7 @@ diff --git a/tun2socks/SocksUdpGwClient.c b/tun2socks/SocksUdpGwClient.c
      
      // init UDP dgram interfaces
      BDatagram_SendAsync_Init(&o->udp_dgram, client->udp_mtu);
-@@ -480,7 +490,7 @@
+@@ -480,7 +511,7 @@
  
  int SocksUdpGwClient_Init (SocksUdpGwClient *o, int udp_mtu, int max_connections, int send_buffer_size, btime_t keepalive_time,
                             BAddr socks_server_addr, const struct BSocksClient_auth_info *auth_info, size_t num_auth_info,
@@ -313,7 +376,7 @@ diff --git a/tun2socks/SocksUdpGwClient.c b/tun2socks/SocksUdpGwClient.c
                             SocksUdpGwClient_handler_received handler_received)
  {
      // see asserts in UdpGwClient_Init
-@@ -495,6 +505,7 @@
+@@ -495,6 +526,7 @@
      o->auth_info = auth_info;
      o->num_auth_info = num_auth_info;
      o->remote_udpgw_addr = remote_udpgw_addr;
@@ -321,7 +384,7 @@ diff --git a/tun2socks/SocksUdpGwClient.c b/tun2socks/SocksUdpGwClient.c
      o->reactor = reactor;
      o->user = user;
      o->handler_received = handler_received;
-@@ -579,6 +590,7 @@
+@@ -579,24 +611,27 @@
      SocksUdpGwClient_conaddr conaddr;
      conaddr.local_addr = local_addr;
      conaddr.remote_addr = remote_addr;
@@ -329,9 +392,32 @@ diff --git a/tun2socks/SocksUdpGwClient.c b/tun2socks/SocksUdpGwClient.c
      
      // lookup connection
      SocksUdpGwClient_connection *con = find_connection(o, conaddr);
-@@ -597,6 +609,7 @@
-         LinkedList1_Append(&o->connections_list, &con->connections_list_node);
-         
+-    
+-    // if no connection and can't create a new one, reuse the least recently used une
+-    if (!con && o->num_connections == o->max_connections) {
+-        con = reuse_connection(o, conaddr);
+-    }
+-    
++
+     if (!con) {
++        // recycle outdated connections
++        if (o->num_connections > 0) {
++            recycle_connections(o);
++        }
++
++        // if max number of connections is reached, force recycle the least recently used une
++        if (o->num_connections >= o->max_connections) {
++            force_recycle_connection(o);
++        }
++
+         // create new connection
+-        con = connection_init(o, conaddr, data, data_len);
++        connection_init(o, conaddr, data, data_len);
+     } else {
+-        // move connection to front of the list
+-        LinkedList1_Remove(&o->connections_list, &con->connections_list_node);
+-        LinkedList1_Append(&o->connections_list, &con->connections_list_node);
+-        
          // send packet to existing connection
 +        con->conaddr.remote_addr = remote_addr;
          connection_send(con, data, data_len);
@@ -344,7 +430,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/tun2socks/SocksUdpGwClient.h b/tun2socks/SocksUdpGwClient.h
 --- a/tun2socks/SocksUdpGwClient.h	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
-+++ b/tun2socks/SocksUdpGwClient.h	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
++++ b/tun2socks/SocksUdpGwClient.h	(revision 7e10414980f3116be7307919bf85ace46ecb6122)
 @@ -55,6 +55,7 @@
      const struct BSocksClient_auth_info *auth_info;
      size_t num_auth_info;
@@ -361,7 +447,13 @@ diff --git a/tun2socks/SocksUdpGwClient.h b/tun2socks/SocksUdpGwClient.h
  } SocksUdpGwClient_conaddr;
  
  typedef struct {
-@@ -98,7 +100,7 @@
+@@ -93,12 +95,13 @@
+     PacketPassInterface udp_recv_if;
+     BAVLNode connections_tree_node;
+     LinkedList1Node connections_list_node;
++    time_t last_active_time;
+ } SocksUdpGwClient_connection;
+ #endif
  
  int SocksUdpGwClient_Init (SocksUdpGwClient *o, int udp_mtu, int max_connections, int send_buffer_size, btime_t keepalive_time,
                             BAddr socks_server_addr, const struct BSocksClient_auth_info *auth_info, size_t num_auth_info,
@@ -377,7 +469,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/tun2socks/tun2socks.c b/tun2socks/tun2socks.c
 --- a/tun2socks/tun2socks.c	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
-+++ b/tun2socks/tun2socks.c	(revision 0b498ff61dce253ec84ba2438b7826da78fe747c)
++++ b/tun2socks/tun2socks.c	(revision 7e10414980f3116be7307919bf85ace46ecb6122)
 @@ -98,6 +98,8 @@
      #endif
      int loglevel;
@@ -545,3 +637,20 @@ diff --git a/tun2socks/tun2socks.c b/tun2socks/tun2socks.c
          } break;
          
          case 6: {
+Index: tun2socks/tun2socks.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/tun2socks/tun2socks.h b/tun2socks/tun2socks.h
+--- a/tun2socks/tun2socks.h	(revision be2ff1739f58a2c52eda65d092597f5f01b388dc)
++++ b/tun2socks/tun2socks.h	(revision 7e10414980f3116be7307919bf85ace46ecb6122)
+@@ -28,7 +28,7 @@
+ #define PROGRAM_NAME "tun2socks"
+ 
+ // size of temporary buffer for passing data from the SOCKS server to TCP for sending
+-#define CLIENT_SOCKS_RECV_BUF_SIZE 8192
++#define CLIENT_SOCKS_RECV_BUF_SIZE 4096
+ 
+ // maximum number of udpgw connections
+ #define DEFAULT_UDPGW_MAX_CONNECTIONS 256
