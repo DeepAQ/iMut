@@ -7,7 +7,6 @@ struct ContentView: View {
     private class ContentViewState: ObservableObject {
         @Published var status = NEVPNStatus.invalid
     }
-
     @StateObject private var state = ContentViewState()
     @State private var showNewConfigView = false
 
@@ -24,20 +23,34 @@ struct ContentView: View {
         })
 
         let toggleAlwaysOn = Binding<Bool>(get: {
-            return self.confManager.globalSetting.alwaysOn
+            self.confManager.globalSetting.alwaysOn
         }, set: { newValue in
             TunnelManager.setAlwaysOn(newValue)
         })
 
         let toggleBypassSpecial = Binding<Bool>(get: {
-            return self.confManager.globalSetting.bypassSpecial
+            self.confManager.globalSetting.bypassSpecial
         }, set: { newValue in
             self.confManager.globalSetting.bypassSpecial = newValue
             self.confManager.saveGlobalSetting()
         })
 
+        let toggleBypassLocalRoute = Binding<Bool>(get: {
+            self.confManager.globalSetting.bypassLocalRoute
+        }, set: { newValue in
+            self.confManager.globalSetting.bypassLocalRoute = newValue
+            self.confManager.saveGlobalSetting()
+        })
+
+        let toggleTunOnly = Binding<Bool>(get: {
+            self.confManager.globalSetting.tunOnly
+        }, set: { newValue in
+            self.confManager.globalSetting.tunOnly = newValue
+            self.confManager.saveGlobalSetting()
+        })
+
         let toggleAllowDebug = Binding<Bool>(get: {
-            return self.confManager.globalSetting.allowDebug
+            self.confManager.globalSetting.allowDebug
         }, set: { newValue in
             self.confManager.globalSetting.allowDebug = newValue
             self.confManager.saveGlobalSetting()
@@ -47,13 +60,13 @@ struct ContentView: View {
             VStack {
                 HStack {
                     HStack(alignment: .bottom) {
-                        Text("iMut").font(.system(size: 32, weight: .bold, design: .monospaced))
+                        Text("iMut").font(.system(size: 32, weight: .bold))
                         Text("a DeepAQ Labs project").font(.system(size: 14)).padding(.bottom, 5)
                     }
                     Spacer()
                     Toggle(isOn: toggleConnect) {
                     }.labelsHidden()
-                }.padding(.horizontal, 20)
+                }.padding(.horizontal, 25)
 
                 Form {
                     Section(header: Text("Configurations")) {
@@ -88,12 +101,27 @@ struct ContentView: View {
                                 Text("DDDD").foregroundColor(.secondary)
                             }
                         })
+                        Toggle(isOn: toggleBypassLocalRoute, label: {
+                            VStack(alignment: .leading) {
+                                Text("Bypass route for local addresses")
+                                Text("This will hide the system status icon").foregroundColor(.secondary)
+                            }
+                        })
+                        Toggle(isOn: toggleTunOnly, label: {
+                            VStack(alignment: .leading) {
+                                Text("TUN only mode")
+                                Text("Force all traffic to go through TUN interface").foregroundColor(.secondary)
+                            }
+                        })
                         Toggle(isOn: toggleAllowDebug, label: {
                             VStack(alignment: .leading) {
                                 Text("Allow debugging")
                                 Text("Enable debug HTTP server on localhost:6061").foregroundColor(.secondary)
                             }
                         })
+                        NavigationLink(destination: LogView()) {
+                            Text("Logs")
+                        }
                     }
                 }
             }.navigationBarHidden(true)

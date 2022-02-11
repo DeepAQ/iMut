@@ -1,4 +1,5 @@
 import NetworkExtension
+import os
 
 class TunnelManager {
     private static var manager: NETunnelProviderManager?
@@ -8,13 +9,13 @@ class TunnelManager {
             manager.isEnabled = true
             manager.saveToPreferences { error in
                 guard error == nil else {
-                    NSLog(String(describing: error))
+                    os_log(.error, "Failed to save preferences: %{public}s", String(describing: error))
                     return
                 }
 
                 manager.loadFromPreferences { error in
                     guard error == nil else {
-                        NSLog(String(describing: error))
+                        os_log(.error, "Failed to load preferences: %{public}s", String(describing: error))
                         return
                     }
 
@@ -23,7 +24,7 @@ class TunnelManager {
                         do {
                             try manager.connection.startVPNTunnel()
                         } catch {
-                            NSLog(String(describing: error))
+                            os_log(.error, "Failed to start tunnel: %{public}s", String(describing: error))
                         }
                     default:
                         break
@@ -60,6 +61,33 @@ class TunnelManager {
             }
         }
     }
+    
+    static func updateConfig(confManager: ConfigManager) {
+        doWithManager { manager in
+            let proto = manager.protocolConfiguration as! NETunnelProviderProtocol
+            var config = proto.providerConfiguration ?? [String: Any]()
+            
+            let globalSetting = Mirror(reflecting: confManager.globalSetting)
+            for setting in globalSetting.children {
+                if let key = setting.label {
+                    config[key] = setting.value
+                }
+            }
+            if confManager.selectedIndex < confManager.configurations.count && confManager.selectedIndex >= 0 {
+                let outboundSetting = Mirror(reflecting: confManager.configurations[confManager.selectedIndex])
+                for setting in outboundSetting.children {
+                    if let key = setting.label {
+                        config[key] = setting.value
+                    }
+                }
+            }
+            
+            proto.providerConfiguration = config
+            manager.saveToPreferences { error in
+                os_log(.error, "Failed to save preferences: %{public}s", String(describing: error))
+            }
+        }
+    }
 
     static func setAlwaysOn(_ alwaysOn: Bool) {
         doWithManager { manager in
@@ -72,13 +100,28 @@ class TunnelManager {
 
             manager.saveToPreferences { error in
                 guard error == nil else {
-                    NSLog(String(describing: error))
+                    os_log(.error, "Failed to save preferences: %{public}s", String(describing: error))
                     return
                 }
-
+                
                 let confManager = ConfigManager.global
                 confManager.globalSetting.alwaysOn = alwaysOn
                 confManager.saveGlobalSetting()
+            }
+        }
+    }
+    
+    static func sendMessage(messageData: Data, responseHandler: ((Data?) -> Void)? = nil) {
+        doWithManager { manager in
+            let session = manager.connection as? NETunnelProviderSession
+            if session?.status == .connected {
+                do {
+                    try session!.sendProviderMessage(messageData, responseHandler: responseHandler)
+                } catch {
+                    responseHandler?(String(describing: error).data(using: .utf8))
+                }
+            } else {
+                responseHandler?("Tunnel not running".data(using: .utf8))
             }
         }
     }
@@ -91,7 +134,7 @@ class TunnelManager {
 
         NETunnelProviderManager.loadAllFromPreferences { managers, error in
             guard error == nil else {
-                NSLog(String(describing: error))
+                os_log(.error, "Failed to load preferences: %{public}s", String(describing: error))
                 return
             }
 
@@ -100,9 +143,11 @@ class TunnelManager {
                 manager = managers[0]
             } else {
                 manager = NETunnelProviderManager()
-                manager.protocolConfiguration = NETunnelProviderProtocol()
-                manager.protocolConfiguration?.serverAddress = "Mut"
             }
+            if !(manager.protocolConfiguration is NETunnelProviderProtocol) {
+                manager.protocolConfiguration = NETunnelProviderProtocol()
+            }
+            manager.protocolConfiguration?.serverAddress = "Mut"
             self.manager = manager
             action(manager)
         }

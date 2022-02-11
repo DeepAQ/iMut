@@ -1,9 +1,10 @@
 import Foundation
+import os
 
 class ConfigManager: ObservableObject {
     static let global = ConfigManager()
 
-    private let userDefaults = UserDefaults(suiteName: "group.com.github.mut.iMut")!
+    private let userDefaults = UserDefaults()
     @Published var globalSetting: GlobalSetting
     @Published var configurations: [Configuration]
     @Published var selectedIndex: Int
@@ -12,6 +13,8 @@ class ConfigManager: ObservableObject {
         self.globalSetting = GlobalSetting(
                 alwaysOn: self.userDefaults.bool(forKey: "alwaysOn"),
                 bypassSpecial: self.userDefaults.bool(forKey: "bypassSpecial"),
+                bypassLocalRoute: self.userDefaults.bool(forKey: "bypassLocalRoute"),
+                tunOnly: self.userDefaults.bool(forKey: "tunOnly"),
                 allowDebug: self.userDefaults.bool(forKey: "allowDebug")
         )
 
@@ -27,8 +30,11 @@ class ConfigManager: ObservableObject {
     func saveGlobalSetting() {
         self.userDefaults.set(self.globalSetting.alwaysOn, forKey: "alwaysOn")
         self.userDefaults.set(self.globalSetting.bypassSpecial, forKey: "bypassSpecial")
+        self.userDefaults.set(self.globalSetting.bypassLocalRoute, forKey: "bypassLocalRoute")
+        self.userDefaults.set(self.globalSetting.tunOnly, forKey: "tunOnly")
         self.userDefaults.set(self.globalSetting.allowDebug, forKey: "allowDebug")
         self.userDefaults.synchronize()
+        TunnelManager.updateConfig(confManager: self)
     }
 
     func saveConfigurations() {
@@ -38,7 +44,7 @@ class ConfigManager: ObservableObject {
             self.userDefaults.synchronize()
             self.updateSelected()
         } catch {
-            NSLog("Failed to save configurations: \(error)")
+            os_log(.error, "Failed to save configurations: %{public}s", String(describing: error))
         }
     }
 
@@ -50,9 +56,8 @@ class ConfigManager: ObservableObject {
     private func updateSelected() {
         if self.selectedIndex < configurations.count {
             self.userDefaults.set(self.selectedIndex, forKey: "selected")
-            self.userDefaults.set(self.configurations[self.selectedIndex].outbound, forKey: "outbound")
-            self.userDefaults.set(self.configurations[self.selectedIndex].dns, forKey: "dns")
             self.userDefaults.synchronize()
+            TunnelManager.updateConfig(confManager: self)
         }
     }
 }
@@ -66,5 +71,7 @@ struct Configuration: Hashable, Codable {
 struct GlobalSetting: Hashable, Codable {
     var alwaysOn: Bool
     var bypassSpecial: Bool
+    var bypassLocalRoute: Bool
+    var tunOnly: Bool
     var allowDebug: Bool
 }
