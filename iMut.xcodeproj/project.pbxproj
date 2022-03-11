@@ -17,7 +17,6 @@
 		34A3338A264DF74100DA0D2F /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A33389264DF74100DA0D2F /* PacketTunnelProvider.swift */; };
 		34B1C5EE2656B4C20007B0DE /* ConfigItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B1C5ED2656B4C20007B0DE /* ConfigItemView.swift */; };
 		34C749A827AD3F4D00449151 /* Core.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C749A727AD3F4D00449151 /* Core.framework */; };
-		34C749AC27AD401500449151 /* libtun2socks.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C749AB27AD400800449151 /* libtun2socks.a */; };
 		34C749AE27AD526D00449151 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C749AD27AD526D00449151 /* LogView.swift */; };
 		34C749AF27AD540500449151 /* PTExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 3432A5A127AA8BC400A8B59C /* PTExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		34D1F71E2657B31600FA1E51 /* directip.txt in Resources */ = {isa = PBXBuildFile; fileRef = 34D1F71D2657B31600FA1E51 /* directip.txt */; };
@@ -71,7 +70,6 @@
 		34A3339A264DFE9000DA0D2F /* PTExtension-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PTExtension-Bridging-Header.h"; sourceTree = "<group>"; };
 		34B1C5ED2656B4C20007B0DE /* ConfigItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigItemView.swift; sourceTree = "<group>"; };
 		34C749A727AD3F4D00449151 /* Core.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Core.framework; sourceTree = "<group>"; };
-		34C749AB27AD400800449151 /* libtun2socks.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libtun2socks.a; sourceTree = "<group>"; };
 		34C749AD27AD526D00449151 /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
 		34D1F71D2657B31600FA1E51 /* directip.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = directip.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -88,7 +86,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34C749AC27AD401500449151 /* libtun2socks.a in Frameworks */,
 				34C749A827AD3F4D00449151 /* Core.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -135,7 +132,6 @@
 		34A3337F264DF73500DA0D2F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				34C749AB27AD400800449151 /* libtun2socks.a */,
 				34C749A727AD3F4D00449151 /* Core.framework */,
 			);
 			name = Frameworks;

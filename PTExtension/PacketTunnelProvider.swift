@@ -35,7 +35,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 NEIPv4Route(destinationAddress: "224.0.0.0", subnetMask: "240.0.0.0"),
                 NEIPv4Route(destinationAddress: "233.252.0.0", subnetMask: "255.255.255.0"),
                 NEIPv4Route(destinationAddress: "240.0.0.0", subnetMask: "240.0.0.0"),
-                NEIPv4Route(destinationAddress: "255.255.255.255", subnetMask: "255.255.255.255"),
             ]
         }
         settings.dnsSettings = NEDNSSettings(servers: ["240.0.0.2"])
@@ -55,7 +54,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
             do {
                 try self.startMut(config)
-                self.startTunnel()
                 completionHandler(nil)
             } catch {
                 os_log(.error, "Failed to start Mut instance: %{public}s", String(describing: error))
@@ -125,8 +123,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let launcher = CoreLauncher()
         launcher.addArg("-in")
         launcher.addArg("mix://localhost:1082/?udp=1")
-//        launcher.addArg("-in")
-//        launcher.addArg("tun://?fd=\(self.getFd())&dnsgw=localhost:1053")
+        launcher.addArg("-in")
+        launcher.addArg("tun://?fd=\(self.getFd())&mtu=\(PacketTunnelProvider.mtu)&dnsgw=localhost:1053")
         launcher.addArg("-out")
         launcher.addArg(outbound)
         launcher.addArg("-dns")
@@ -151,32 +149,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             GlobalFreeOSMemory()
         }
         memoryPressureSource.activate()
-    }
-
-    private func startTunnel() {
-        let args = [
-            "tun2socks",
-            "--logger", "syslog",
-            "--tunfd", String(self.getFd()),
-            "--tunmtu", String(PacketTunnelProvider.mtu),
-            "--enable-udprelay",
-            "--netif-ipaddr", "240.0.0.2",
-            "--netif-netmask", "255.255.255.252",
-            "--socks-server-addr", "127.0.0.1:1082",
-            "--dnsgw", "127.0.0.1:1053",
-        ]
-        var cargs = args.map {
-            strdup($0)
-        }
-
-        DispatchQueue.global(qos: .background).async {
-            tun2socks_main(Int32(cargs.count), &cargs)
-            os_log("Tunnel stopped")
-            for ptr in cargs {
-                free(ptr)
-            }
-        }
-        os_log("Tunnel started")
     }
 
     private func getFd() -> Int32 {
